@@ -1,6 +1,8 @@
 # chai-joi
 Chai extensions for Joi validations.
 
+### NOTE: In development, not yet useful.
+
 * * *
 
 # methods

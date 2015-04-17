@@ -1,0 +1,25 @@
+{
+  "name": "chai-joi",
+  "version": "0.0.2",
+  "description": "Chai Extensions for Joi Validation",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raisch/chai-joi.git"
+  },
+  "keywords": [
+    "chai",
+    "joi",
+    "testing"
+  ],
+  "author": "Rob Raisch <raisch@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/raisch/chai-joi/issues"
+  },
+  "homepage": "https://github.com/raisch/chai-joi",
+  "dependencies": {
+    "chai": "^2.2.0",
+    "lodash": "^3.7.0"
+  }
+}
