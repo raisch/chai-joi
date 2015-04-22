@@ -1,6 +1,6 @@
 {
   "name": "chai-joi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Chai Extensions for Joi Validation",
   "main": "index.js",
   "repository": {
@@ -17,8 +17,8 @@
   "bugs": {
     "url": "https://github.com/raisch/chai-joi/issues"
   },
-  "scripts":{
-    "test":"mocha"
+  "scripts": {
+    "test": "mocha"
   },
   "homepage": "https://github.com/raisch/chai-joi",
   "dependencies": {
