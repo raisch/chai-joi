@@ -2,9 +2,39 @@
 
 Extends Chai with Joi specific assertions.
 
-See test/chai-joi.js for possible uses.
+[![npm version](https://badge.fury.io/js/chai-joi.svg)](http://badge.fury.io/js/chai-joi)
+[![Build Status](https://travis-ci.org/raisch/chai-joi.svg?branch=master)](https://travis-ci.org/raisch/chai-joi)
+[![Dependencies Status](https://david-dm.org/raisch/chai-joi.svg)](https://david-dm.org/raisch/chai-joi)
+[![DevDependencies Status](https://david-dm.org/raisch/chai-joi/dev-status.svg)](https://david-dm.org/raisch/chai-joi#info=devDependencies)
 
+**TL;DL**
 
+Assuming that `result` is the result of a Joi validation:
+
+- Assert-style
+ - chai.assert.isValidation(result)
+ 
+- BDD-style
+  - result.should
+    - [.not].be.a.validation
+    - [.not].validate
+    - [.not].have.an.error
+    - [.not].have.a.value
+    - [.not].have.errmsgs
+    - [.not].have.errmsgs.that.include(str)
+    - [.not].have.errmsg(str)
+   
+- TDD-style
+  - expect(result).to
+    - [.not].be.a.validation
+    - [.not].validate
+    - [.not].have.an.error
+    - [.not].have.a.value
+    - [.not].have.errmsgs
+    - [.not].have.errmsgs.that.include(str)
+    - [.not].have.errmsg(str)
+
+(See test/chai-joi.js for uses.)
 
 **Example:**
 ```js
