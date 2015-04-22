@@ -1,6 +1,7 @@
 /* Created by raisch on 4/16/15. */
 
 /*jshint node:true, bitwise:true, camelcase:false, curly:true, undef:false, unused:false, eqeqeq:true, shadow:true */
+/*global define*/
 
 'use strict';
 
@@ -226,7 +227,7 @@ var chai_joi=function (_chai, utils) { // plugin
 
   // raw assertions
   _chai.assert.isValidation = function (obj, msg) {
-    new Assertion(obj, msg).is.a.validation;
+		var as=new Assertion(obj, msg).is.a.validation;
   };
 
 };
