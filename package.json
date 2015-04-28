@@ -1,6 +1,6 @@
 {
   "name": "chai-joi",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Chai Extensions for Joi Validation",
   "main": "index.js",
   "repository": {

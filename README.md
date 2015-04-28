@@ -39,7 +39,7 @@ Assuming that `result` is the result of a Joi validation:
 **Example:**
 ```js
 var joi    = require('joi'),
-    chai   = require('chai')
+    chai   = require('chai'),
     expect = chai.expect;
 
 chai.should();

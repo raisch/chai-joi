@@ -1,7 +1,7 @@
 /* Created by raisch on 4/16/15. */
 
-/*jshint node:true, bitwise:true, camelcase:false, curly:true, undef:false, unused:false, eqeqeq:true, shadow:true */
-/*global define*/
+/*jshint node:true, bitwise:true, camelcase:false, curly:true, undef:false, unused:false, eqeqeq:true, shadow:true, expr:true */
+/*global define, require*/
 
 'use strict';
 
@@ -76,12 +76,13 @@ var getErrmsgs = function (result) {
  *
  */
 
+//noinspection JSUnusedGlobalSymbols,JSUnusedLocalSymbols
 /**
  * Asserts that the target object is result of a call to Joi.validate()
  * @param {object} target
  * @returns {boolean}
  */
-function isValidation(target){ //stub for jsdoc
+function isValidation(target) { //stub for jsdoc
   return true;
 }
 
@@ -227,7 +228,8 @@ var chai_joi=function (_chai, utils) { // plugin
 
   // raw assertions
   _chai.assert.isValidation = function (obj, msg) {
-		var as=new Assertion(obj, msg).is.a.validation;
+    //noinspection BadExpressionStatementJS
+    new Assertion(obj, msg).is.a.validation;
   };
 
 };
@@ -238,14 +240,12 @@ var chai_joi=function (_chai, utils) { // plugin
   if (_.isFunction(require) && _.isObject(exports) && _.isObject(module)) { // node
     module.exports = plugin;
   }
-  else {
-    if (_.isFunction(define) && define.amd) { // amd
-      define(function () {
-        return plugin;
-      });
-    }
-    else { // other
-      chai.use(plugin);
-    }
+  else if (_.isFunction(define) && define.amd) { // amd
+    define(function () {
+      return plugin;
+    });
+  }
+  else { // other
+    chai.use(plugin);
   }
 }(chai_joi));
