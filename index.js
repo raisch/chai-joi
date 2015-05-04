@@ -121,7 +121,7 @@ var validate = function () {
   var target = this._obj;
   chai.assert.isValidation(target);
   this.assert(_.has(target, 'error') && null === target.error,
-      '#{this} should validate but does not',
+      '#{this} should validate but does not because '+getErrmsgs(target),
       '#{this} should not validate but it does'
   );
 };

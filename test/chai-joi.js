@@ -121,6 +121,32 @@ describe('properties', function () {
       joi.validate(1, joi.string()).should.not.validate;
     });
 
+    it('should provide the correct error message for an incorrect type',function(){
+      var target={a:1};
+      try {
+        expect(joi.validate(target,joi.object({a:joi.string()}))).to.validate;
+      }
+      catch(e) {
+        if (e instanceof chai.AssertionError && e.toString().match(/"a" must be a string$/)) {
+          return;
+        }
+        throw e;
+      }
+    });
+
+    it('should provide the correct error message for an missing required field',function(){
+      var target={a:"1"};
+      try {
+        expect(joi.validate(target,joi.object({a:joi.string(),b:joi.string().required()}))).to.validate;
+      }
+      catch(e) {
+        if (e instanceof chai.AssertionError && e.toString().match(/"b" is required$/)) {
+          return;
+        }
+        throw e;
+      }
+    })
+
   });
 
   describe('error', function () {
