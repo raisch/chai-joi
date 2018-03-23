@@ -107,7 +107,7 @@ var validation = function () {
   this.assert(!_.isEmpty(target), '#{this} is not a Joi validation because it is an empty object');
   var fields = _.keys(target);
   this.assert(_.contains(fields, 'value', 'error'), '#{this} is not a Joi validation because it is missing required keys');
-  target = _.omit(target, ['error', 'value']);
+  target = _.omit(target, ['error', 'value', 'then', 'catch']);
   this.assert(_.isEmpty(target), '#{this} is not a validation because it contains unexpected keys');
 };
 
