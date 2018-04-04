@@ -12,7 +12,7 @@ Extends Chai with Joi specific assertions.
 Assuming that `result` is the result of a Joi validation:
 
 - Assert-style
- - chai.assert.isValidation(result)
+  - chai.assert.isValidation(result)
  
 - BDD-style
   - result.should
