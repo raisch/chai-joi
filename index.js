@@ -85,6 +85,7 @@ var isValidation = () => {
  * expect(target).to.[not].be.a.validation
  * target.should.[not].be.a.validation
  */
+<<<<<<< HEAD
 var validation = () => {
   var target = this._obj
   this.assert(_.isObject(target), '#{this} is not a Joi validation because it must be an object')
@@ -94,6 +95,17 @@ var validation = () => {
   target = _.omit(target, ['error', 'value', 'then', 'catch'])
   this.assert(_.isEmpty(target), '#{this} is not a validation because it contains unexpected keys')
 }
+=======
+var validation = function () {
+  var target = this._obj;
+  this.assert(_.isObject(target), '#{this} is not a Joi validation because it must be an object');
+  this.assert(!_.isEmpty(target), '#{this} is not a Joi validation because it is an empty object');
+  var fields = _.keys(target);
+  this.assert(_.contains(fields, 'value', 'error'), '#{this} is not a Joi validation because it is missing required keys');
+  target = _.omit(target, ['error', 'value', 'then', 'catch']);
+  this.assert(_.isEmpty(target), '#{this} is not a validation because it contains unexpected keys');
+};
+>>>>>>> 4b80178424c56d4709044e9e4a3441be85e71d8b
 
 /**
  * Assert that target validates correctly
