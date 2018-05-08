@@ -158,13 +158,13 @@ describe('properties', function() {
     it('should have the correct error using should', function () {
       var result = joi.validate(1, joi.string());
       result.should.have.error.with.property('name', 'ValidationError');
-      result.should.to.have.error.with.nested.property('details[0].message', '"value" must be a string');
+      result.should.have.error.with.deep.property('details[0].message', '"value" must be a string');
     });
 
     it('should have the correct error using expect', function () {
       var result = joi.validate(1, joi.string());
       expect(result).to.have.error.with.property('name', 'ValidationError');
-      expect(result).to.have.error.with.nested.property('details[0].message', '"value" must be a string');
+      expect(result).to.have.error.with.deep.property('details[0].message', '"value" must be a string');
     });
   });
 
