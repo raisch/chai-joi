@@ -1,10 +1,6 @@
 /* Created by raisch on 4/17/15. */
 
-/*jshint node:true, bitwise:true, camelcase:false, curly:true, undef:false, unused:false, eqeqeq:true, shadow:true */
-
-'use strict';
-
-var util = require('util'),
+const util = require('util'),
     joi = require('joi'),
     chai = require('chai'),
     assert = chai.assert,
@@ -21,19 +17,19 @@ var ValidationError=function(msg){
 ValidationError.prototype=Object.create(Error.prototype);
 ValidationError.prototype.constructor=ValidationError;
 
-describe('assertions', function () {
+describe('assertions', function() {
 
-  it('should correctly identify Joi validations', function () {
+  it('should correctly identify Joi validations', function() {
     assert.isValidation(joi.validate('1', joi.string()));
   });
 
-  it('should not identify a non-object as a validation', function () {
+  it('should not identify a non-object as a validation', function() {
     var result;
     try {
       result = assert.isValidation(null);
     }
     catch (e) {
-      if (e instanceof chai.AssertionError && e.toString().match(/must be an object$/)) {
+      if (e instanceof chai.AssertionError && e.message.includes('must be an object')) {
         return;
       }
       throw e;
@@ -41,13 +37,13 @@ describe('assertions', function () {
     throw new Error('unexpected success: ' + util.inspect(result));
   });
 
-  it('should not identify an empty object as a validation', function () {
+  it('should not identify an empty object as a validation', function() {
     var result;
     try {
       result = assert.isValidation({});
     }
     catch (e) {
-      if (e instanceof chai.AssertionError && e.toString().match(/empty object$/)) {
+      if (e instanceof chai.AssertionError && e.message.includes('empty object')) {
         return;
       }
       throw e;
@@ -55,13 +51,13 @@ describe('assertions', function () {
     throw new Error('unexpected success: ' + util.inspect(result));
   });
 
-  it('should not identify an object with a missing field as a validation', function () {
+  it('should not identify an object with a missing field as a validation', function() {
     var result;
     try {
       result = assert.isValidation({error: 1});
     }
     catch (e) {
-      if (e instanceof chai.AssertionError && e.toString().match(/required keys$/)) {
+      if (e instanceof chai.AssertionError && e.message.includes('expected keys')) {
         return;
       }
       throw e;
@@ -69,7 +65,7 @@ describe('assertions', function () {
     throw new Error('unexpected success: ' + util.inspect(result));
   });
 
-  it('should not identify an object with extra fields as a validation', function () {
+  it('should not identify an object with extra fields as a validation', function() {
     var result;
     try {
       result = assert.isValidation({
@@ -79,7 +75,7 @@ describe('assertions', function () {
       });
     }
     catch (e) {
-      if (e instanceof chai.AssertionError && e.toString().match(/unexpected keys$/)) {
+      if (e instanceof chai.AssertionError && e.message.includes('expected keys')) {
         return;
       }
       throw e;
@@ -89,39 +85,39 @@ describe('assertions', function () {
 
 });
 
-describe('properties', function () {
+describe('properties', function() {
 
-  describe('validation', function () {
+  describe('validation', function() {
 
-    it('should identify a validation using expect', function () {
+    it('should identify a validation using expect', function() {
       expect(joi.validate('a', joi.string())).to.be.a.validation;
     });
 
-    it('should identify a validation using should', function () {
+    it('should identify a validation using should', function() {
       joi.validate('a', joi.string()).should.be.a.validation;
     });
 
   });
 
-  describe('validate', function () {
+  describe('validate', function() {
 
-    it('should validate using expect', function () {
+    it('should validate using expect', function() {
       expect(joi.validate('a', joi.string())).to.validate;
     });
 
-    it('should not validate using expect', function () {
+    it('should not validate using expect', function() {
       expect(joi.validate(1, joi.string())).to.not.validate;
     });
 
-    it('should validate using should', function () {
+    it('should validate using should', function() {
       joi.validate('a', joi.string()).should.validate;
     });
 
-    it('should not validate using should', function () {
+    it('should not validate using should', function() {
       joi.validate(1, joi.string()).should.not.validate;
     });
 
-    it('should provide the correct error message for an incorrect type',function(){
+    it('should provide the correct error message for an incorrect type', function() {
       var target={a:1};
       try {
         expect(joi.validate(target,joi.object({a:joi.string()}))).to.validate;
@@ -134,7 +130,7 @@ describe('properties', function () {
       }
     });
 
-    it('should provide the correct error message for an missing required field',function(){
+    it('should provide the correct error message for an missing required field', function() {
       var target={a:"1"};
       try {
         expect(joi.validate(target,joi.object({a:joi.string(),b:joi.string().required()}))).to.validate;
@@ -149,66 +145,64 @@ describe('properties', function () {
 
   });
 
-  describe('error', function () {
-
-    it('should validate using expect', function () {
+  describe('error', function() {
+    it('should validate using expect', function() {
       expect(joi.validate('a', joi.string())).to.not.have.an.error;
     });
 
-    it('should have the correct error using expect',function(){
-      var result=joi.validate(1, joi.string());
-      expect(result).to.have.error.with.property('name','ValidationError');
-      expect(result).to.have.error.with.deep.property('details[0].message','"value" must be a string');
-    });
-
-    it('should not validate using expect', function () {
+    it('should not validate using expect', function() {
       expect(joi.validate(1, joi.string())).to.have.an.error;
     });
 
-    it('should validate using should', function () {
+    it('should validate using should', function() {
       joi.validate('a', joi.string()).should.not.have.an.error;
     });
 
-    it('should have the correct error using should',function(){
-      var result=joi.validate(1, joi.string());
-      result.should.have.error.with.property('name','ValidationError');
-      result.should.to.have.error.with.deep.property('details[0].message','"value" must be a string');
-    });
-
-    it('should not validate using should', function () {
+    it('should not validate using should', function() {
       joi.validate(1, joi.string()).should.have.an.error;
     });
 
+    it('should have the correct error using should', function () {
+      var result = joi.validate(1, joi.string());
+      result.should.have.error.with.property('name', 'ValidationError');
+      result.should.to.have.error.with.nested.property('details[0].message', '"value" must be a string');
+    });
+
+    it('should have the correct error using expect', function () {
+      var result = joi.validate(1, joi.string());
+      expect(result).to.have.error.with.property('name', 'ValidationError');
+      expect(result).to.have.error.with.nested.property('details[0].message', '"value" must be a string');
+    });
   });
 
-  describe('value', function () {
+  describe('value', function() {
 
-    it('should validate using expect', function () {
+    it('should validate using expect', function() {
       expect(joi.validate('a', joi.string())).to.have.a.value;
     });
 
-    it('should have the correct value using expect',function(){
+    it('should have the correct value using expect', function() {
       expect(joi.validate('a', joi.string())).to.have.a.value.equal('a');
     });
 
-    it('should not have an incorrect value using expect',function(){
+    it('should not have an incorrect value using expect', function() {
       expect(joi.validate('a', joi.string())).to.have.a.value.not.equal('b');
     });
 
-    it('should validate using should', function () {
+    it('should validate using should', function() {
       joi.validate('a', joi.string()).should.have.a.value;
     });
 
-    it('should have the correct value using should',function(){
+    it('should have the correct value using should', function() {
       joi.validate('a', joi.string()).should.have.a.value.equal('a');
     });
 
-    it('should not have an incorrect value using should',function(){
+    it('should not have an incorrect value using should', function() {
       joi.validate('a', joi.string()).should.have.a.value.not.equal('b');
     });
   });
 
-  describe('errmsgs',function(){
+  describe('errmsgs', function() {
 
     var result;
 
@@ -218,51 +212,51 @@ describe('properties', function () {
       result=joi.validate(data,schema,{abortEarly:false});
     });
 
-    it('should have errmsgs using expect',function(){
+    it('should have errmsgs using expect', function() {
       expect(joi.validate(1,joi.string())).to.have.errmsgs;
     });
 
-    it('should not have errmsgs using expect',function(){
+    it('should not have errmsgs using expect', function() {
       expect(joi.validate(1,joi.number())).to.not.have.errmsgs;
     });
 
-    it('should have the right number of errmsgs using expect',function(){
+    it('should have the right number of errmsgs using expect', function() {
       expect(result).to.have.errmsgs.length(2);
     });
 
-    it('should have the right errmsgs using expect',function(){
+    it('should have the right errmsgs using expect', function() {
       expect(result).to.have.errmsgs.that.include('"str" must be a string');
       expect(result).to.have.errmsgs.that.include('"num" must be a number');
     });
 
-    it('should not have the wrong errmsgs using expect',function(){
+    it('should not have the wrong errmsgs using expect', function() {
       expect(result).to.have.errmsgs.that.not.include('wtf?');
     });
 
-    it('should have errmsgs using should',function(){
+    it('should have errmsgs using should', function() {
       joi.validate(1,joi.string()).should.have.errmsgs;
     });
 
-    it('should not have errmsgs using should',function(){
+    it('should not have errmsgs using should', function() {
       joi.validate(1,joi.number()).should.not.have.errmsgs;
     });
 
-    it('should have the right number of errmsgs using should',function(){
+    it('should have the right number of errmsgs using should', function() {
       result.should.have.errmsgs.length(2);
     });
 
-    it('should have the right errmsgs using should',function(){
+    it('should have the right errmsgs using should', function() {
       result.should.have.errmsgs.that.include('"str" must be a string');
       result.should.have.errmsgs.that.include('"num" must be a number');
     });
 
-    it('should not have the wrong errmsgs using should',function(){
+    it('should not have the wrong errmsgs using should', function() {
       result.should.have.errmsgs.that.not.include('wtf?');
     });
 
   });
 
-  describe('errmsg',function(){
+  describe('errmsg', function() {
     var result;
 
     beforeEach(function(){
@@ -271,21 +265,21 @@ describe('properties', function () {
       result=joi.validate(data,schema,{abortEarly:false});
     });
 
-    it('should have the right errmsgs using expect',function(){
+    it('should have the right errmsgs using expect', function() {
       expect(result).to.have.errmsg('"str" must be a string');
       expect(result).to.have.errmsg('"num" must be a number');
     });
 
-    it('should not have the wrong errmsgs using expect',function(){
+    it('should not have the wrong errmsgs using expect', function() {
       expect(result).to.not.have.errmsg('wtf?');
     });
 
-    it('should have the right errmsgs using should',function(){
+    it('should have the right errmsgs using should', function() {
       result.should.have.errmsg('"str" must be a string');
       result.should.have.errmsg('"num" must be a number');
     });
 
-    it('should not have the wrong errmsgs using should',function(){
+    it('should not have the wrong errmsgs using should', function() {
       result.should.not.have.errmsg('wtf?');
     });
 

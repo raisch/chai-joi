@@ -1,19 +1,13 @@
 /* Created by raisch on 4/16/15. */
+const _ = require('lodash');
+const chai = require('chai');
+const { Assertion } = chai;
 
-/*jshint node:true, bitwise:true, camelcase:false, curly:true, undef:false, unused:false, eqeqeq:true, shadow:true, expr:true */
-/*global define, require*/
-
-'use strict';
-
-//@formatter:off
-/** @ignore */
-var _         = require('lodash'),
-    chai      = require('chai');
-//@formatter:on
+const FIELDS_TO_VALIDATE = ['error', 'value', 'then', 'catch'];
 
 /**
  * @module chai-joi
- * @version 0.0.5
+ * @version 2.1.1
  * @mixes chai
  *
  * @description
@@ -60,40 +54,19 @@ var _         = require('lodash'),
  * @returns {*|Array}
  * @private
  */
-var getErrmsgs = function (result) {
-  var err = result.error || {},
-      details = err.details || [],
-      errmsgs = _.pluck(details, 'message');
-  return errmsgs || [];
+function getErrorMessages(result) {
+  const details = _.get(result, 'error.details', []);
+  return _.map(details, 'message');
 };
 
-/**
- * @namespace assert
- *
- * @description
- *
- * Extension to chai.assert to test for a valid Joi validation result.
- *
- */
-
-//noinspection JSUnusedGlobalSymbols,JSUnusedLocalSymbols
 /**
  * Asserts that the target object is result of a call to Joi.validate()
  * @param {object} target
  * @returns {boolean}
  */
-function isValidation(target) { //stub for jsdoc
-  return true;
+function isValidation(obj, msg) {
+  new Assertion(obj, msg).is.a.validation;
 }
-
-/**
- * @namespace property
- *
- * @description
- *
- * Chainable properties.
- *
- */
 
 /**
  * Assert that target is a Joi validation
@@ -101,14 +74,17 @@ function isValidation(target) { //stub for jsdoc
  * expect(target).to.[not].be.a.validation
  * target.should.[not].be.a.validation
  */
-var validation = function () {
-  var target = this._obj;
+function validation() {
+  const target = this._obj;
   this.assert(_.isObject(target), '#{this} is not a Joi validation because it must be an object');
   this.assert(!_.isEmpty(target), '#{this} is not a Joi validation because it is an empty object');
-  var fields = _.keys(target);
-  this.assert(_.contains(fields, 'value', 'error'), '#{this} is not a Joi validation because it is missing required keys');
-  target = _.omit(target, ['error', 'value', 'then', 'catch']);
-  this.assert(_.isEmpty(target), '#{this} is not a validation because it contains unexpected keys');
+  const fields = _.keys(target);
+  const allFieldsPresent = _.every(FIELDS_TO_VALIDATE.map(field => _.includes(fields, field)));
+
+  this.assert(
+    allFieldsPresent,
+    `${this} is not a validation because it does not contain expected keys`
+  );
 };
 
 /**
@@ -117,11 +93,12 @@ var validation = function () {
  * expect(target).should.[not].validate
  * target.should.[not].validate
  */
-var validate = function () {
-  var target = this._obj;
-  chai.assert.isValidation(target);
+function validate() {
+  const target = this._obj;
+
+  isValidation(target);
   this.assert(_.has(target, 'error') && null === target.error,
-      '#{this} should validate but does not because '+getErrmsgs(target),
+      '#{this} should validate but does not because '+getErrorMessages(target),
       '#{this} should not validate but it does'
   );
 };
@@ -133,10 +110,10 @@ var validate = function () {
  * expect(target).to.[not].have.an.error
  * target.should.[not].have.an.error
  */
-var error = function (utils) {
-  var target = this._obj;
-  chai.assert.isValidation(target);
-  var error = target.error || null,
+function error(utils) {
+  const target = this._obj;
+  isValidation(target);
+  const error = target.error || null,
       json = JSON.stringify(target, null, '\t');
   this.assert(null !== error,
       '#{this} should have error but does not: ' + json,
@@ -152,10 +129,10 @@ var error = function (utils) {
  * expect(target).to.[not].have.a.value
  * target.should.[not].have.a.value
  */
-var value = function value(utils) {
-  var target = this._obj,
-      value = target.value || null;
-  chai.assert.isValidation(target);
+function value(utils) {
+  const target = this._obj,
+        value = target.value || null;
+  isValidation(target);
   this.assert(null !== value,
       '#{this} should have value',
       '#{this} should not have value'
@@ -173,25 +150,17 @@ var value = function value(utils) {
  * expect(target).to.[not].have.errmsgs.that.include(errmsg)
  * target.should.have.errmsgs.that.include(errmsg)
  */
-var errmsgs = function errmsgs(utils) {
-  var obj = this._obj,
-      errmsgs = getErrmsgs(obj);
-  this.assert(
-      'array' === utils.type(errmsgs) && errmsgs.length > 0,
-      'expected #{this} to have errmsgs',
-      'expected #{this} to not have errmsgs'
-  );
-  utils.flag(this, 'object', errmsgs);
-};
+function errmsgs(utils) {
+  const obj = this._obj,
+        errorMessages = getErrorMessages(obj);
 
-/**
- * @namespace method
- *
- * @description
- *
- * Chainable methods.
- *
- */
+  this.assert(
+    _.isArray(errorMessages) && !_.isEmpty(errorMessages),
+    'expected #{this} to have errmsgs',
+    'expected #{this} to not have errmsgs'
+  );
+  utils.flag(this, 'object', errorMessages);
+};
 
 /**
  * Assert that target contains specified error message (unsuccessful validation).
@@ -199,42 +168,31 @@ var errmsgs = function errmsgs(utils) {
  * @example
  * target.should.[not].have.errmsg(msg)
  */
-var errmsg = function errmsg(msg) {
-  var obj = this._obj,
-      errmsgs = getErrmsgs(obj);
+function errmsg(msg) {
+  const obj = this._obj,
+        errorMessages = getErrorMessages(obj);
   this.assert(
-      _.contains(errmsgs, msg),
-      'expected #{this} to have an error message: #{errmsg}',
-      'expected #{this} to not an error message: #{errmsg}',
-      msg,   // expected
-      errmsgs   // actual
+    _.includes(errorMessages, msg),
+    'expected #{this} to have an error message: #{errmsg}',
+    'expected #{this} to not an error message: #{errmsg}',
+    msg,   // expected
+    errorMessages   // actual
   );
 };
 
-//@formatter:off
-
-var chai_joi=function (_chai, utils) { // plugin
-  var Assertion = _chai.Assertion;
-
+function chaiJoi(_chai, utils) { // plugin
   // properties
-  Assertion.addProperty('validation', validation                                   );
-  Assertion.addProperty('validate',   validate                                     );
-  Assertion.addProperty('value',      function () { _.bind(value, this)(utils);   });
-  Assertion.addProperty('error',      function () { _.bind(error, this)(utils);   });
-  Assertion.addProperty('errmsgs',    function () { _.bind(errmsgs, this)(utils); });
+  Assertion.addProperty('validation', validation);
+  Assertion.addProperty('validate', validate);
+  Assertion.addProperty('value', function () { _.bind(value, this)(utils); });
+  Assertion.addProperty('error', function () { _.bind(error, this)(utils); });
+  Assertion.addProperty('errmsgs',function () { _.bind(errmsgs, this)(utils); });
 
   // methods
   Assertion.addMethod('errmsg', errmsg);
 
-  // raw assertions
-  _chai.assert.isValidation = function (obj, msg) {
-    //noinspection BadExpressionStatementJS
-    new Assertion(obj, msg).is.a.validation;
-  };
-
+  _chai.assert.isValidation = isValidation;
 };
-
-//@formatter:on
 
 (function (plugin) {
   if (_.isFunction(require) && _.isObject(exports) && _.isObject(module)) { // node
@@ -248,4 +206,4 @@ var chai_joi=function (_chai, utils) { // plugin
   else { // other
     chai.use(plugin);
   }
-}(chai_joi));
+}(chaiJoi));
