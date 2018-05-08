@@ -7,7 +7,7 @@ const FIELDS_TO_VALIDATE = ['error', 'value', 'then', 'catch'];
 
 /**
  * @module chai-joi
- * @version 2.1.1
+ * @version 2.1.2
  * @mixes chai
  *
  * @description

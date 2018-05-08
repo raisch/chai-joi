@@ -28,7 +28,6 @@
     "lodash": "^4.17.10"
   },
   "devDependencies": {
-    "babel-register": "^6.26.0",
     "joi": "^13.1.2",
     "mocha": "^5.0.5"
   },
