@@ -18,7 +18,6 @@ ValidationError.prototype=Object.create(Error.prototype);
 ValidationError.prototype.constructor=ValidationError;
 
 describe('assertions', function() {
-
   it('should correctly identify Joi validations', function() {
     assert.isValidation(joi.validate('1', joi.string()));
   });
@@ -82,13 +81,10 @@ describe('assertions', function() {
     }
     throw new Error('unexpected success: ' + util.inspect(result));
   });
-
 });
 
 describe('properties', function() {
-
   describe('validation', function() {
-
     it('should identify a validation using expect', function() {
       expect(joi.validate('a', joi.string())).to.be.a.validation;
     });
@@ -96,11 +92,9 @@ describe('properties', function() {
     it('should identify a validation using should', function() {
       joi.validate('a', joi.string()).should.be.a.validation;
     });
-
   });
 
   describe('validate', function() {
-
     it('should validate using expect', function() {
       expect(joi.validate('a', joi.string())).to.validate;
     });
@@ -141,8 +135,7 @@ describe('properties', function() {
         }
         throw e;
       }
-    })
-
+    });
   });
 
   describe('error', function() {
@@ -176,7 +169,6 @@ describe('properties', function() {
   });
 
   describe('value', function() {
-
     it('should validate using expect', function() {
       expect(joi.validate('a', joi.string())).to.have.a.value;
     });
@@ -203,7 +195,6 @@ describe('properties', function() {
   });
 
   describe('errmsgs', function() {
-
     var result;
 
     beforeEach(function(){
@@ -253,7 +244,6 @@ describe('properties', function() {
     it('should not have the wrong errmsgs using should', function() {
       result.should.have.errmsgs.that.not.include('wtf?');
     });
-
   });
 
   describe('errmsg', function() {
@@ -282,7 +272,5 @@ describe('properties', function() {
     it('should not have the wrong errmsgs using should', function() {
       result.should.not.have.errmsg('wtf?');
     });
-
-  })
-
+  });
 });
