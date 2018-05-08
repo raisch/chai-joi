@@ -28,3 +28,5 @@ node_modules
 
 # IDEA
 .idea
+
+out/
