@@ -1,12 +1,13 @@
-'use strict'
-/* eslint-env node, es6 */
+/* Created by raisch on 4/16/15. */
+const _ = require('lodash');
+const chai = require('chai');
+const { Assertion } = chai;
 
-const _ = require('lodash')
-const chai = require('chai')
+const FIELDS_TO_VALIDATE = ['error', 'value', 'then', 'catch'];
 
 /**
  * @module chai-joi
- * @version 2.0.1
+ * @version 2.1.2
  * @mixes chai
  *
  * @description
@@ -53,30 +54,18 @@ const chai = require('chai')
  * @returns {*|Array}
  * @private
  */
-const getErrmsgs = (result) => {
-  const err = _.get(result, 'error', {})
-  const details = _.get(err, 'details', [])
-  const errmsgs = _.map(details, 'message')
-  return errmsgs
-}
+function getErrorMessages(result) {
+  const details = _.get(result, 'error.details', []);
+  return _.map(details, 'message');
+};
 
 /**
  * Asserts that the target object is result of a call to Joi.validate()
  * @param {object} target
  * @returns {boolean}
  */
-var isValidation = () => {
-  var target = this._obj
-  if(!_.isPlainObject(target)) {
-    return false
-  }
-  const actual = _.keys(target).sort().join(',')
-  const expected = 'error,value'
-  console.log({actual,expected})
-  if(!_.isEqual(expected,actual)) {
-    return false
-  }
-  return true
+function isValidation(obj, msg) {
+  new Assertion(obj, msg).is.a.validation;
 }
 
 /**
@@ -85,27 +74,18 @@ var isValidation = () => {
  * expect(target).to.[not].be.a.validation
  * target.should.[not].be.a.validation
  */
-<<<<<<< HEAD
-var validation = () => {
-  var target = this._obj
-  this.assert(_.isObject(target), '#{this} is not a Joi validation because it must be an object')
-  this.assert(!_.isEmpty(target), '#{this} is not a Joi validation because it must not be an empty object')
-  var fields = _.keys(target)
-  this.assert(_.contains(fields, 'value', 'error'), '#{this} is not a Joi validation because it is missing required keys')
-  target = _.omit(target, ['error', 'value', 'then', 'catch'])
-  this.assert(_.isEmpty(target), '#{this} is not a validation because it contains unexpected keys')
-}
-=======
-var validation = function () {
-  var target = this._obj;
+function validation() {
+  const target = this._obj;
   this.assert(_.isObject(target), '#{this} is not a Joi validation because it must be an object');
   this.assert(!_.isEmpty(target), '#{this} is not a Joi validation because it is an empty object');
-  var fields = _.keys(target);
-  this.assert(_.contains(fields, 'value', 'error'), '#{this} is not a Joi validation because it is missing required keys');
-  target = _.omit(target, ['error', 'value', 'then', 'catch']);
-  this.assert(_.isEmpty(target), '#{this} is not a validation because it contains unexpected keys');
+  const fields = _.keys(target);
+  const allFieldsPresent = _.every(FIELDS_TO_VALIDATE.map(field => _.includes(fields, field)));
+
+  this.assert(
+    allFieldsPresent,
+    `${this} is not a validation because it does not contain expected keys`
+  );
 };
->>>>>>> 4b80178424c56d4709044e9e4a3441be85e71d8b
 
 /**
  * Assert that target validates correctly
@@ -113,14 +93,15 @@ var validation = function () {
  * expect(target).should.[not].validate
  * target.should.[not].validate
  */
-var validate = () => {
-  var target = this._obj
-  chai.assert.isValidation(target)
-  this.assert(_.has(target, 'error') && target.error === null,
-      '#{this} should validate but does not because ' + getErrmsgs(target),
+function validate() {
+  const target = this._obj;
+
+  isValidation(target);
+  this.assert(_.has(target, 'error') && null === target.error,
+      '#{this} should validate but does not because '+getErrorMessages(target),
       '#{this} should not validate but it does'
-  )
-}
+  );
+};
 
 /**
  * Assert that target contains one or more errors (unsuccessful validation).
@@ -129,17 +110,17 @@ var validate = () => {
  * expect(target).to.[not].have.an.error
  * target.should.[not].have.an.error
  */
-var error = (utils) => {
-  var target = this._obj
-  chai.assert.isValidation(target)
-  var error = target.error || null,
-    json = JSON.stringify(target, null, '\t')
-  this.assert(error !== null,
+function error(utils) {
+  const target = this._obj;
+  isValidation(target);
+  const error = target.error || null,
+      json = JSON.stringify(target, null, '\t');
+  this.assert(null !== error,
       '#{this} should have error but does not: ' + json,
       '#{this} should not not have error but does: ' + json
-  )
-  utils.flag(this, 'object', error)
-}
+  );
+  utils.flag(this, 'object', error);
+};
 
 /**
  * Assert that target contains a value.
@@ -148,16 +129,16 @@ var error = (utils) => {
  * expect(target).to.[not].have.a.value
  * target.should.[not].have.a.value
  */
-var value = (utils) => {
-  var target = this._obj,
-    value = target.value || null
-  chai.assert.isValidation(target)
-  this.assert(value !== null,
+function value(utils) {
+  const target = this._obj,
+        value = target.value || null;
+  isValidation(target);
+  this.assert(null !== value,
       '#{this} should have value',
       '#{this} should not have value'
-  )
-  utils.flag(this, 'object', value)
-}
+  );
+  utils.flag(this, 'object', value);
+};
 
 /**
  * Assert that target contains one or more error messages (unsuccessful validation).
@@ -169,16 +150,17 @@ var value = (utils) => {
  * expect(target).to.[not].have.errmsgs.that.include(errmsg)
  * target.should.have.errmsgs.that.include(errmsg)
  */
-var errmsgs = (utils) => {
-  var obj = this._obj,
-    errmsgs = getErrmsgs(obj)
+function errmsgs(utils) {
+  const obj = this._obj,
+        errorMessages = getErrorMessages(obj);
+
   this.assert(
-      utils.type(errmsgs) === 'array' && errmsgs.length > 0,
-      'expected #{this} to have errmsgs',
-      'expected #{this} to not have errmsgs'
-  )
-  utils.flag(this, 'object', errmsgs)
-}
+    _.isArray(errorMessages) && !_.isEmpty(errorMessages),
+    'expected #{this} to have errmsgs',
+    'expected #{this} to not have errmsgs'
+  );
+  utils.flag(this, 'object', errorMessages);
+};
 
 /**
  * Assert that target contains specified error message (unsuccessful validation).
@@ -186,50 +168,42 @@ var errmsgs = (utils) => {
  * @example
  * target.should.[not].have.errmsg(msg)
  */
-var errmsg = (msg) => {
-  var obj = this._obj,
-    errmsgs = getErrmsgs(obj)
+function errmsg(msg) {
+  const obj = this._obj,
+        errorMessages = getErrorMessages(obj);
   this.assert(
-      _.contains(errmsgs, msg),
-      'expected #{this} to have an error message: #{errmsg}',
-      'expected #{this} to not an error message: #{errmsg}',
-      msg,   // expected
-      errmsgs   // actual
-  )
-}
-
-// @formatter:off
-
-var chai_joi = function (_chai, utils) { // plugin
-  var Assertion = _chai.Assertion
-
-  // properties
-  Assertion.addProperty('validation', validation)
-  Assertion.addProperty('validate', validate)
-  Assertion.addProperty('value', function () { _.bind(value, this)(utils) })
-  Assertion.addProperty('error', function () { _.bind(error, this)(utils) })
-  Assertion.addProperty('errmsgs', function () { _.bind(errmsgs, this)(utils) })
-
-  // methods
-  Assertion.addMethod('errmsg', errmsg)
-
-  // raw assertions
-  _chai.assert.isValidation = function (obj, msg) {
-    // noinspection BadExpressionStatementJS
-    new Assertion(obj, msg).is.a.validation
-  }
+    _.includes(errorMessages, msg),
+    'expected #{this} to have an error message: #{errmsg}',
+    'expected #{this} to not an error message: #{errmsg}',
+    msg,   // expected
+    errorMessages   // actual
+  );
 };
 
-// @formatter:on
+function chaiJoi(_chai, utils) { // plugin
+  // properties
+  Assertion.addProperty('validation', validation);
+  Assertion.addProperty('validate', validate);
+  Assertion.addProperty('value', function () { _.bind(value, this)(utils); });
+  Assertion.addProperty('error', function () { _.bind(error, this)(utils); });
+  Assertion.addProperty('errmsgs',function () { _.bind(errmsgs, this)(utils); });
+
+  // methods
+  Assertion.addMethod('errmsg', errmsg);
+
+  _chai.assert.isValidation = isValidation;
+};
 
 (function (plugin) {
   if (_.isFunction(require) && _.isObject(exports) && _.isObject(module)) { // node
-    module.exports = plugin
-  } else if (_.isFunction(define) && define.amd) { // amd
-    define(function () {
-      return plugin
-    })
-  } else { // other
-    chai.use(plugin)
+    module.exports = plugin;
   }
-}(chai_joi))
+  else if (_.isFunction(define) && define.amd) { // amd
+    define(function () {
+      return plugin;
+    });
+  }
+  else { // other
+    chai.use(plugin);
+  }
+}(chaiJoi));

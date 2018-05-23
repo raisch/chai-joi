@@ -1,4 +1,6 @@
 language: node_js
+before_script:
+  - npm install chai@3
 node_js:
   - "6"
   - "7"
